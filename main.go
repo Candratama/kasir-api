@@ -26,6 +26,17 @@ func init() {
 	nextID = 4
 }
 
+func getPort() string {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = ":3000"
+	} else {
+		port = ":" + port
+	}
+
+	return port
+}
+
 func main() { 
 	// Endpoint untuk health check
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
@@ -129,13 +140,10 @@ func main() {
 		http.Error(w, "Product not found", http.StatusNotFound)
 	})
 
-	// Menjalankan server di port yang ditentukan oleh environment variable PORT
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "3333" // default port untuk Dokploy
-	}
+	// Menjalankan server di port yang ditentukan
+	port := getPort()
 	fmt.Printf("Server running di port %s\n", port)
-	err := http.ListenAndServe(":"+port, nil)
+	err := http.ListenAndServe(port, nil)
 	if err != nil {
 		fmt.Println("gagal running server:", err)
 	}
