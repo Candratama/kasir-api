@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 )
 
@@ -128,10 +129,14 @@ func main() {
 		http.Error(w, "Product not found", http.StatusNotFound)
 	})
 
-	// Menjalankan server di port 8080
-	fmt.Println("Server running di localhost:8080")
-	err := http.ListenAndServe(":8080", nil) 
+	// Menjalankan server di port yang ditentukan oleh environment variable PORT
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3333" // default port untuk Dokploy
+	}
+	fmt.Printf("Server running di port %s\n", port)
+	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
-		fmt.Println("gagal running server")
-	} 
+		fmt.Println("gagal running server:", err)
+	}
 }
