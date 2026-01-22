@@ -1,0 +1,351 @@
+basePath: /
+definitions:
+  main.Category:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  main.Product:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+    type: object
+host: localhost:3000
+info:
+  contact: {}
+  description: API untuk aplikasi kasir dengan fitur produk dan kategori
+  title: Kasir API
+  version: "1.0"
+paths:
+  /add-category:
+    post:
+      consumes:
+      - application/json
+      description: Menambahkan kategori baru
+      parameters:
+      - description: Category data
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/main.Category'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.Category'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Add new category
+      tags:
+      - Categories
+  /add-product:
+    post:
+      consumes:
+      - application/json
+      description: Menambahkan produk baru
+      parameters:
+      - description: Product data
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/main.Product'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.Product'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Add new product
+      tags:
+      - Products
+  /categories:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil semua daftar kategori
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.Category'
+            type: array
+      summary: Get all categories
+      tags:
+      - Categories
+  /categories/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil kategori berdasarkan ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.Category'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get category by ID
+      tags:
+      - Categories
+  /delete-category/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Menghapus kategori berdasarkan ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete category
+      tags:
+      - Categories
+  /delete-product/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Menghapus produk berdasarkan ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete product
+      tags:
+      - Products
+  /edit-category/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Mengedit kategori berdasarkan ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Category data
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/main.Category'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.Category'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update category
+      tags:
+      - Categories
+  /edit-product/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Mengedit produk berdasarkan ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Product data
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/main.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.Product'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update product
+      tags:
+      - Products
+  /health:
+    get:
+      consumes:
+      - application/json
+      description: Memeriksa status kesehatan server
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health Check
+      tags:
+      - Health
+  /products:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil semua daftar produk
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.Product'
+            type: array
+      summary: Get all products
+      tags:
+      - Products
+  /products/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil produk berdasarkan ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.Product'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get product by ID
+      tags:
+      - Products
+schemes:
+- http
+swagger: "2.0"
