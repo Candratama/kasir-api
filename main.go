@@ -27,8 +27,10 @@ func getPort() string {
 }
 
 func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		// return html page with link to swagger ui
+	mux := http.NewServeMux()
+
+	// Home page (exact match root only)
+	mux.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html")
 		fmt.Fprintf(w, `<html>
 		<head><title>Kasir API</title></head>
@@ -38,26 +40,33 @@ func main() {
 		</body>
 		</html>`)
 	})
-	http.Handle("/docs/", httpSwagger.Handler(
+
+	// Swagger docs
+	mux.Handle("/docs/", httpSwagger.Handler(
 		httpSwagger.URL("/docs/doc.json"),
 	))
 
-	http.HandleFunc("/health", HealthCheckHandler)
-	http.HandleFunc("/products", GetProductsHandler)
-	http.HandleFunc("/products/", GetProductByIDHandler)
-	http.HandleFunc("/add-product", AddProductHandler)
-	http.HandleFunc("/edit-product/", UpdateProductHandler)
-	http.HandleFunc("/delete-product/", DeleteProductHandler)
-	http.HandleFunc("/categories", GetCategoriesHandler)
-	http.HandleFunc("/categories/", GetCategoryByIDHandler)
-	http.HandleFunc("/add-category", AddCategoryHandler)
-	http.HandleFunc("/edit-category/", UpdateCategoryHandler)
-	http.HandleFunc("/delete-category/", DeleteCategoryHandler)
+	// Health check
+	mux.HandleFunc("GET /health", HealthCheckHandler)
+
+	// Products
+	mux.HandleFunc("GET /products", GetProductsHandler)
+	mux.HandleFunc("POST /products", AddProductHandler)
+	mux.HandleFunc("GET /products/{id}", GetProductByIDHandler)
+	mux.HandleFunc("PUT /products/{id}", UpdateProductHandler)
+	mux.HandleFunc("DELETE /products/{id}", DeleteProductHandler)
+
+	// Categories
+	mux.HandleFunc("GET /categories", GetCategoriesHandler)
+	mux.HandleFunc("POST /categories", AddCategoryHandler)
+	mux.HandleFunc("GET /categories/{id}", GetCategoryByIDHandler)
+	mux.HandleFunc("PUT /categories/{id}", UpdateCategoryHandler)
+	mux.HandleFunc("DELETE /categories/{id}", DeleteCategoryHandler)
 
 	port := getPort()
 	fmt.Printf("Server running di port %s\n", port)
 	fmt.Printf("Swagger UI: http://localhost%s/docs/\n", port)
-	err := http.ListenAndServe(port, nil)
+	err := http.ListenAndServe(port, mux)
 	if err != nil {
 		fmt.Println("gagal running server:", err)
 	}

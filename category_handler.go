@@ -30,8 +30,7 @@ func GetCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 // @Router /categories/{id} [get]
 func GetCategoryByIDHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	idStr := r.URL.Path[len("/categories/"):]
-	id, err := strconv.Atoi(idStr)
+	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid ID", http.StatusBadRequest)
 		return
@@ -51,12 +50,8 @@ func GetCategoryByIDHandler(w http.ResponseWriter, r *http.Request) {
 // @Param category body Category true "Category data"
 // @Success 201 {object} Category
 // @Failure 400 {object} map[string]string
-// @Router /add-category [post]
+// @Router /categories [post]
 func AddCategoryHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
 	var newCategory Category
 	err := json.NewDecoder(r.Body).Decode(&newCategory)
 	if err != nil {
@@ -82,14 +77,9 @@ func AddCategoryHandler(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} Category
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
-// @Router /edit-category/{id} [put]
+// @Router /categories/{id} [put]
 func UpdateCategoryHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPut {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-	idStr := r.URL.Path[len("/edit-category/"):]
-	id, err := strconv.Atoi(idStr)
+	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid ID", http.StatusBadRequest)
 		return
@@ -101,6 +91,7 @@ func UpdateCategoryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if _, exists := categories[id]; exists {
+		updatedCategory.ID = id
 		categories[id] = updatedCategory
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(updatedCategory)
@@ -118,14 +109,9 @@ func UpdateCategoryHandler(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} map[string]string
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
-// @Router /delete-category/{id} [delete]
+// @Router /categories/{id} [delete]
 func DeleteCategoryHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodDelete {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-	idStr := r.URL.Path[len("/delete-category/"):]
-	id, err := strconv.Atoi(idStr)
+	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid ID", http.StatusBadRequest)
 		return

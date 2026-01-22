@@ -30,8 +30,7 @@ func GetProductsHandler(w http.ResponseWriter, r *http.Request) {
 // @Router /products/{id} [get]
 func GetProductByIDHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	idStr := r.URL.Path[len("/products/"):]
-	id, err := strconv.Atoi(idStr)
+	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid ID", http.StatusBadRequest)
 		return
@@ -51,12 +50,8 @@ func GetProductByIDHandler(w http.ResponseWriter, r *http.Request) {
 // @Param product body Product true "Product data"
 // @Success 201 {object} Product
 // @Failure 400 {object} map[string]string
-// @Router /add-product [post]
+// @Router /products [post]
 func AddProductHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
 	var newProduct Product
 	err := json.NewDecoder(r.Body).Decode(&newProduct)
 	if err != nil {
@@ -83,14 +78,9 @@ func AddProductHandler(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} Product
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
-// @Router /edit-product/{id} [put]
+// @Router /products/{id} [put]
 func UpdateProductHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPut {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-	idStr := r.URL.Path[len("/edit-product/"):]
-	id, err := strconv.Atoi(idStr)
+	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid ID", http.StatusBadRequest)
 		return
@@ -102,6 +92,7 @@ func UpdateProductHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if _, exists := products[id]; exists {
+		updatedProduct.ID = id
 		products[id] = updatedProduct
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(updatedProduct)
@@ -119,14 +110,9 @@ func UpdateProductHandler(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} map[string]string
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
-// @Router /delete-product/{id} [delete]
+// @Router /products/{id} [delete]
 func DeleteProductHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodDelete {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-	idStr := r.URL.Path[len("/delete-product/"):]
-	id, err := strconv.Atoi(idStr)
+	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid ID", http.StatusBadRequest)
 		return
