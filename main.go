@@ -70,15 +70,15 @@ func main() {
 	}
 	defer db.Close()
 
-	// Dependency Injection - Product
-	productRepo := repositories.NewProductRepository(db)
-	productService := services.NewProductService(productRepo)
-	productHandler := handlers.NewProductHandler(productService)
-
-	// Dependency Injection - Category
+	// Dependency Injection - Category (create first, needed by Product)
 	categoryRepo := repositories.NewCategoryRepository(db)
 	categoryService := services.NewCategoryService(categoryRepo)
 	categoryHandler := handlers.NewCategoryHandler(categoryService)
+
+	// Dependency Injection - Product
+	productRepo := repositories.NewProductRepository(db)
+	productService := services.NewProductService(productRepo, categoryRepo)
+	productHandler := handlers.NewProductHandler(productService)
 
 	mux := http.NewServeMux()
 

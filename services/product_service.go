@@ -1,16 +1,18 @@
 package services
 
 import (
+	"errors"
 	"kasir-api/models"
 	"kasir-api/repositories"
 )
 
 type ProductService struct {
-	repo *repositories.ProductRepository
+	repo         *repositories.ProductRepository
+	categoryRepo *repositories.CategoryRepository
 }
 
-func NewProductService(repo *repositories.ProductRepository) *ProductService {
-	return &ProductService{repo: repo}
+func NewProductService(repo *repositories.ProductRepository, categoryRepo *repositories.CategoryRepository) *ProductService {
+	return &ProductService{repo: repo, categoryRepo: categoryRepo}
 }
 
 func (s *ProductService) GetAll() ([]models.Product, error) {
@@ -18,6 +20,13 @@ func (s *ProductService) GetAll() ([]models.Product, error) {
 }
 
 func (s *ProductService) Create(data *models.Product) error {
+	// Validasi category_id jika diisi
+	if data.CategoryID > 0 {
+		_, err := s.categoryRepo.GetByID(data.CategoryID)
+		if err != nil {
+			return errors.New("category_id tidak ditemukan")
+		}
+	}
 	return s.repo.Create(data)
 }
 
@@ -26,6 +35,13 @@ func (s *ProductService) GetByID(id int) (*models.Product, error) {
 }
 
 func (s *ProductService) Update(product *models.Product) error {
+	// Validasi category_id jika diisi
+	if product.CategoryID > 0 {
+		_, err := s.categoryRepo.GetByID(product.CategoryID)
+		if err != nil {
+			return errors.New("category_id tidak ditemukan")
+		}
+	}
 	return s.repo.Update(product)
 }
 
