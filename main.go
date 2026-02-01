@@ -8,28 +8,81 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
+	"strings"
 
+	"kasir-api/database"
 	_ "kasir-api/docs"
+	"kasir-api/handlers"
+	"kasir-api/repositories"
+	"kasir-api/services"
 
+	"github.com/spf13/viper"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
 
-func getPort() string {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = ":3000"
-	} else {
-		port = ":" + port
-	}
-	return port
+type Config struct {
+	Port   string `mapstructure:"PORT"`
+	DBConn string `mapstructure:"DB_CONN"`
+}
+
+// CORS middleware
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }
 
 func main() {
+	// Load config from .env
+	viper.AutomaticEnv()
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+
+	if _, err := os.Stat(".env"); err == nil {
+		viper.SetConfigFile(".env")
+		err := viper.ReadInConfig()
+		if err != nil {
+			fmt.Println("gagal membaca file .env:", err)
+			return
+		}
+	}
+
+	config := Config{
+		Port:   viper.GetString("PORT"),
+		DBConn: viper.GetString("DB_CONN"),
+	}
+
+	// Setup database
+	db, err := database.InitDB(config.DBConn)
+	if err != nil {
+		log.Fatal("Failed to initialize database:", err)
+	}
+	defer db.Close()
+
+	// Dependency Injection - Product
+	productRepo := repositories.NewProductRepository(db)
+	productService := services.NewProductService(productRepo)
+	productHandler := handlers.NewProductHandler(productService)
+
+	// Dependency Injection - Category
+	categoryRepo := repositories.NewCategoryRepository(db)
+	categoryService := services.NewCategoryService(categoryRepo)
+	categoryHandler := handlers.NewCategoryHandler(categoryService)
+
 	mux := http.NewServeMux()
 
-	// Home page (exact match root only)
+	// Home page
 	mux.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html")
 		fmt.Fprintf(w, `<html>
@@ -49,24 +102,22 @@ func main() {
 	// Health check
 	mux.HandleFunc("GET /health", HealthCheckHandler)
 
-	// Products
-	mux.HandleFunc("GET /products", GetProductsHandler)
-	mux.HandleFunc("POST /products", AddProductHandler)
-	mux.HandleFunc("GET /products/{id}", GetProductByIDHandler)
-	mux.HandleFunc("PUT /products/{id}", UpdateProductHandler)
-	mux.HandleFunc("DELETE /products/{id}", DeleteProductHandler)
+	// Products routes (layered architecture)
+	mux.HandleFunc("/api/produk", productHandler.HandleProducts)
+	mux.HandleFunc("/api/produk/", productHandler.HandleProductByID)
 
-	// Categories
-	mux.HandleFunc("GET /categories", GetCategoriesHandler)
-	mux.HandleFunc("POST /categories", AddCategoryHandler)
-	mux.HandleFunc("GET /categories/{id}", GetCategoryByIDHandler)
-	mux.HandleFunc("PUT /categories/{id}", UpdateCategoryHandler)
-	mux.HandleFunc("DELETE /categories/{id}", DeleteCategoryHandler)
+	// Categories routes (layered architecture)
+	mux.HandleFunc("/api/kategori", categoryHandler.HandleCategories)
+	mux.HandleFunc("/api/kategori/", categoryHandler.HandleCategoryByID)
 
-	port := getPort()
-	fmt.Printf("Server running di port %s\n", port)
-	fmt.Printf("Swagger UI: http://localhost%s/docs/\n", port)
-	err := http.ListenAndServe(port, mux)
+	// Wrap with CORS middleware
+	handler := corsMiddleware(mux)
+
+	// Start server
+	addr := "0.0.0.0:" + config.Port
+	fmt.Printf("Server running di %s\n", addr)
+	fmt.Printf("Swagger UI: http://localhost:%s/docs/\n", config.Port)
+	err = http.ListenAndServe(addr, handler)
 	if err != nil {
 		fmt.Println("gagal running server:", err)
 	}

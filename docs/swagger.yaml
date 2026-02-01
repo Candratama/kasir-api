@@ -1,6 +1,6 @@
 basePath: /
 definitions:
-  main.Category:
+  models.Category:
     properties:
       description:
         type: string
@@ -9,14 +9,16 @@ definitions:
       name:
         type: string
     type: object
-  main.Product:
+  models.Product:
     properties:
       id:
         type: integer
       name:
         type: string
       price:
-        type: number
+        type: integer
+      stock:
+        type: integer
     type: object
 host: localhost:3000
 info:
@@ -25,7 +27,7 @@ info:
   title: Kasir API
   version: "1.0"
 paths:
-  /categories:
+  /api/kategori:
     get:
       consumes:
       - application/json
@@ -37,7 +39,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/main.Category'
+              $ref: '#/definitions/models.Category'
             type: array
       summary: Get all categories
       tags:
@@ -52,14 +54,14 @@ paths:
         name: category
         required: true
         schema:
-          $ref: '#/definitions/main.Category'
+          $ref: '#/definitions/models.Category'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/main.Category'
+            $ref: '#/definitions/models.Category'
         "400":
           description: Bad Request
           schema:
@@ -69,7 +71,7 @@ paths:
       summary: Add new category
       tags:
       - Categories
-  /categories/{id}:
+  /api/kategori/{id}:
     delete:
       consumes:
       - application/json
@@ -120,7 +122,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/main.Category'
+            $ref: '#/definitions/models.Category'
         "400":
           description: Bad Request
           schema:
@@ -151,14 +153,14 @@ paths:
         name: category
         required: true
         schema:
-          $ref: '#/definitions/main.Category'
+          $ref: '#/definitions/models.Category'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/main.Category'
+            $ref: '#/definitions/models.Category'
         "400":
           description: Bad Request
           schema:
@@ -174,24 +176,7 @@ paths:
       summary: Update category
       tags:
       - Categories
-  /health:
-    get:
-      consumes:
-      - application/json
-      description: Memeriksa status kesehatan server
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Health Check
-      tags:
-      - Health
-  /products:
+  /api/produk:
     get:
       consumes:
       - application/json
@@ -203,7 +188,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/main.Product'
+              $ref: '#/definitions/models.Product'
             type: array
       summary: Get all products
       tags:
@@ -218,14 +203,14 @@ paths:
         name: product
         required: true
         schema:
-          $ref: '#/definitions/main.Product'
+          $ref: '#/definitions/models.Product'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/main.Product'
+            $ref: '#/definitions/models.Product'
         "400":
           description: Bad Request
           schema:
@@ -235,7 +220,7 @@ paths:
       summary: Add new product
       tags:
       - Products
-  /products/{id}:
+  /api/produk/{id}:
     delete:
       consumes:
       - application/json
@@ -286,7 +271,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/main.Product'
+            $ref: '#/definitions/models.Product'
         "400":
           description: Bad Request
           schema:
@@ -317,14 +302,14 @@ paths:
         name: product
         required: true
         schema:
-          $ref: '#/definitions/main.Product'
+          $ref: '#/definitions/models.Product'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/main.Product'
+            $ref: '#/definitions/models.Product'
         "400":
           description: Bad Request
           schema:
@@ -340,6 +325,23 @@ paths:
       summary: Update product
       tags:
       - Products
+  /health:
+    get:
+      consumes:
+      - application/json
+      description: Memeriksa status kesehatan server
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health Check
+      tags:
+      - Health
 schemes:
 - http
 swagger: "2.0"

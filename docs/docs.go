@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/categories": {
+        "/api/kategori": {
             "get": {
                 "description": "Mengambil semua daftar kategori",
                 "consumes": [
@@ -34,7 +34,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/main.Category"
+                                "$ref": "#/definitions/models.Category"
                             }
                         }
                     }
@@ -59,7 +59,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.Category"
+                            "$ref": "#/definitions/models.Category"
                         }
                     }
                 ],
@@ -67,7 +67,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/main.Category"
+                            "$ref": "#/definitions/models.Category"
                         }
                     },
                     "400": {
@@ -82,7 +82,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/categories/{id}": {
+        "/api/kategori/{id}": {
             "get": {
                 "description": "Mengambil kategori berdasarkan ID",
                 "consumes": [
@@ -108,7 +108,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.Category"
+                            "$ref": "#/definitions/models.Category"
                         }
                     },
                     "400": {
@@ -157,7 +157,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.Category"
+                            "$ref": "#/definitions/models.Category"
                         }
                     }
                 ],
@@ -165,7 +165,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.Category"
+                            "$ref": "#/definitions/models.Category"
                         }
                     },
                     "400": {
@@ -240,33 +240,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/health": {
-            "get": {
-                "description": "Memeriksa status kesehatan server",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Health"
-                ],
-                "summary": "Health Check",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/products": {
+        "/api/produk": {
             "get": {
                 "description": "Mengambil semua daftar produk",
                 "consumes": [
@@ -285,7 +259,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/main.Product"
+                                "$ref": "#/definitions/models.Product"
                             }
                         }
                     }
@@ -310,7 +284,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.Product"
+                            "$ref": "#/definitions/models.Product"
                         }
                     }
                 ],
@@ -318,7 +292,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/main.Product"
+                            "$ref": "#/definitions/models.Product"
                         }
                     },
                     "400": {
@@ -333,7 +307,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/products/{id}": {
+        "/api/produk/{id}": {
             "get": {
                 "description": "Mengambil produk berdasarkan ID",
                 "consumes": [
@@ -359,7 +333,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.Product"
+                            "$ref": "#/definitions/models.Product"
                         }
                     },
                     "400": {
@@ -408,7 +382,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.Product"
+                            "$ref": "#/definitions/models.Product"
                         }
                     }
                 ],
@@ -416,7 +390,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.Product"
+                            "$ref": "#/definitions/models.Product"
                         }
                     },
                     "400": {
@@ -490,10 +464,36 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/health": {
+            "get": {
+                "description": "Memeriksa status kesehatan server",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Health Check",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
-        "main.Category": {
+        "models.Category": {
             "type": "object",
             "properties": {
                 "description": {
@@ -507,7 +507,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.Product": {
+        "models.Product": {
             "type": "object",
             "properties": {
                 "id": {
@@ -517,7 +517,10 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "price": {
-                    "type": "number"
+                    "type": "integer"
+                },
+                "stock": {
+                    "type": "integer"
                 }
             }
         }
