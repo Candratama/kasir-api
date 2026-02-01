@@ -82,6 +82,9 @@ func main() {
 
 	mux := http.NewServeMux()
 
+	// Set DB for health check
+	SetDB(db)
+
 	// Home page
 	mux.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html")
@@ -101,6 +104,7 @@ func main() {
 
 	// Health check
 	mux.HandleFunc("GET /health", HealthCheckHandler)
+	mux.HandleFunc("GET /health/db", DBHealthCheckHandler)
 
 	// Products routes (layered architecture)
 	mux.HandleFunc("/api/produk", productHandler.HandleProducts)

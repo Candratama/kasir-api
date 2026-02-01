@@ -346,6 +346,29 @@ paths:
       summary: Health Check
       tags:
       - Health
+  /health/db:
+    get:
+      consumes:
+      - application/json
+      description: Memeriksa koneksi ke database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Database Health Check
+      tags:
+      - Health
 schemes:
 - http
 swagger: "2.0"
