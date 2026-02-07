@@ -9,6 +9,29 @@ definitions:
       name:
         type: string
     type: object
+  models.CheckoutItem:
+    properties:
+      product_id:
+        type: integer
+      quantity:
+        type: integer
+    type: object
+  models.CheckoutRequest:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/models.CheckoutItem'
+        type: array
+    type: object
+  models.DailySalesReport:
+    properties:
+      produk_terlaris:
+        $ref: '#/definitions/models.TopProduct'
+      total_revenue:
+        type: integer
+      total_transaksi:
+        type: integer
+    type: object
   models.Product:
     properties:
       category_id:
@@ -24,6 +47,41 @@ definitions:
       stock:
         type: integer
     type: object
+  models.TopProduct:
+    properties:
+      nama:
+        type: string
+      qty_terjual:
+        type: integer
+    type: object
+  models.Transaction:
+    properties:
+      created_at:
+        type: string
+      details:
+        items:
+          $ref: '#/definitions/models.TransactionDetail'
+        type: array
+      id:
+        type: integer
+      total_amount:
+        type: integer
+    type: object
+  models.TransactionDetail:
+    properties:
+      id:
+        type: integer
+      product_id:
+        type: integer
+      product_name:
+        type: string
+      quantity:
+        type: integer
+      subtotal:
+        type: integer
+      transaction_id:
+        type: integer
+    type: object
 host: localhost:3000
 info:
   contact: {}
@@ -31,6 +89,40 @@ info:
   title: Kasir API
   version: "1.0"
 paths:
+  /api/checkout:
+    post:
+      consumes:
+      - application/json
+      description: Membuat transaksi baru dengan daftar produk dan quantity
+      parameters:
+      - description: Checkout items
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CheckoutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Transaction'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Checkout transaction
+      tags:
+      - Transactions
   /api/kategori:
     get:
       consumes:
@@ -184,7 +276,12 @@ paths:
     get:
       consumes:
       - application/json
-      description: Mengambil semua daftar produk
+      description: Mengambil semua daftar produk, bisa filter by name
+      parameters:
+      - description: Filter by product name
+        in: query
+        name: name
+        type: string
       produces:
       - application/json
       responses:
@@ -329,6 +426,61 @@ paths:
       summary: Update product
       tags:
       - Products
+  /api/report:
+    get:
+      description: Mengambil laporan penjualan berdasarkan rentang tanggal
+      parameters:
+      - description: Start date (YYYY-MM-DD)
+        in: query
+        name: start_date
+        required: true
+        type: string
+      - description: End date (YYYY-MM-DD)
+        in: query
+        name: end_date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.DailySalesReport'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get sales report by date range
+      tags:
+      - Reports
+  /api/report/hari-ini:
+    get:
+      description: Mengambil laporan penjualan hari ini
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.DailySalesReport'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get daily sales report
+      tags:
+      - Reports
   /health:
     get:
       consumes:

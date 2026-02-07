@@ -80,6 +80,16 @@ func main() {
 	productService := services.NewProductService(productRepo, categoryRepo)
 	productHandler := handlers.NewProductHandler(productService)
 
+	// Dependency Injection - Transaction
+	transactionRepo := repositories.NewTransactionRepository(db)
+	transactionService := services.NewTransactionService(transactionRepo)
+	transactionHandler := handlers.NewTransactionHandler(transactionService)
+
+	// Dependency Injection - Report
+	reportRepo := repositories.NewReportRepository(db)
+	reportService := services.NewReportService(reportRepo)
+	reportHandler := handlers.NewReportHandler(reportService)
+
 	mux := http.NewServeMux()
 
 	// Set DB for health check
@@ -113,6 +123,13 @@ func main() {
 	// Categories routes (layered architecture)
 	mux.HandleFunc("/api/kategori", categoryHandler.HandleCategories)
 	mux.HandleFunc("/api/kategori/", categoryHandler.HandleCategoryByID)
+
+	// Transaction routes
+	mux.HandleFunc("/api/checkout", transactionHandler.HandleCheckout)
+
+	// Report routes
+	mux.HandleFunc("/api/report/hari-ini", reportHandler.HandleDailyReport)
+	mux.HandleFunc("/api/report", reportHandler.HandleReport)
 
 	// Wrap with CORS middleware
 	handler := corsMiddleware(mux)
