@@ -14,7 +14,7 @@ import (
 	"strings"
 
 	"kasir-api/database"
-	_ "kasir-api/docs"
+	"kasir-api/docs"
 	"kasir-api/handlers"
 	"kasir-api/repositories"
 	"kasir-api/services"
@@ -24,8 +24,9 @@ import (
 )
 
 type Config struct {
-	Port   string `mapstructure:"PORT"`
-	DBConn string `mapstructure:"DB_CONN"`
+	Port        string `mapstructure:"PORT"`
+	DBConn      string `mapstructure:"DB_CONN"`
+	SwaggerHost string `mapstructure:"SWAGGER_HOST"`
 }
 
 // CORS middleware
@@ -59,8 +60,15 @@ func main() {
 	}
 
 	config := Config{
-		Port:   viper.GetString("PORT"),
-		DBConn: viper.GetString("DB_CONN"),
+		Port:        viper.GetString("PORT"),
+		DBConn:      viper.GetString("DB_CONN"),
+		SwaggerHost: viper.GetString("SWAGGER_HOST"),
+	}
+
+	// Override Swagger host/scheme for production
+	if config.SwaggerHost != "" {
+		docs.SwaggerInfo.Host = config.SwaggerHost
+		docs.SwaggerInfo.Schemes = []string{"https"}
 	}
 
 	// Setup database
